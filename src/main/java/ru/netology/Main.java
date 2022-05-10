@@ -77,7 +77,6 @@ public class Main {
         });
 
         server.addHandler(Method.POST, "/forms.html", new Handler() {
-            // TODO: handlers code
             public void handle(Request request, BufferedOutputStream responseStream) throws IOException {
                 Response response = new Response();
                 response.setMimeType("text/html; charset=utf-8");

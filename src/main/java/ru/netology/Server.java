@@ -61,7 +61,8 @@ public class Server {
 
             ConcurrentHashMap<String, Handler> pathsAndHandlers = handlers.get(request.getMethod());
             if (pathsAndHandlers != null) {
-                Handler handler = pathsAndHandlers.get(request.getUrl());
+                String url = request.getUrl().split("\\?",2)[0];
+                Handler handler = pathsAndHandlers.get(url);
                 if (handler != null) {
                     handler.handle(request, out);
                     return;
