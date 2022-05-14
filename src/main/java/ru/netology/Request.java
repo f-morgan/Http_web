@@ -17,6 +17,7 @@ public class Request {
     private final String body;
 
     public Request(String message) throws IOException {
+        Method requestMethod;
 
         this.message = message;
         String[] messageParts = message.split(DELIMITER);
@@ -24,7 +25,13 @@ public class Request {
         String[] headersLines = head.split(NEWLINE);
         String[] startingLine = headersLines[0].split(" ");
 
-        this.method = Method.valueOf(startingLine[0]);
+        try {
+            requestMethod = Method.valueOf(startingLine[0].toUpperCase());
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            requestMethod = null;
+        }
+        this.method = requestMethod;
         this.url = startingLine[1];
         this.headers = Collections.unmodifiableMap(
                 new HashMap<>() {{

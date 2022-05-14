@@ -56,23 +56,41 @@ public class Server {
                 builder.append(buffer);
                 buffer.clear();
             }
+            String message = builder.toString();
+            if (message.equals("")) return;
 
             Request request = new Request(builder.toString());
 
-            ConcurrentHashMap<String, Handler> pathsAndHandlers = handlers.get(request.getMethod());
-            if (pathsAndHandlers != null) {
-                Handler handler = pathsAndHandlers.get(request.getUrl());
-                if (handler != null) {
-                    handler.handle(request, out);
-                    return;
-                }else{
-                    answer404NotFound(out);
+            if (request.getMethod()==null) {
+                answer405(out);
+            } else {
+
+                ConcurrentHashMap<String, Handler> pathsAndHandlers = handlers.get(request.getMethod());
+                if (pathsAndHandlers != null) {
+                    Handler handler = pathsAndHandlers.get(request.getUrl());
+                    if (handler != null) {
+                        handler.handle(request, out);
+                        return;
+                    } else {
+                        answer404NotFound(out);
+                    }
                 }
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void answer405(BufferedOutputStream out) throws IOException {
+        Response response = new Response();
+        response.setStatusCode(405);
+        response.setStatus("Method Not Allowed");
+        response.addHeader("Content-Type", "text/html; charset=utf-8");
+        response.setBody("<html><body><h1>Method Not Allowed</h1></body><html>".getBytes(StandardCharsets.UTF_8));
+        out.write(response.getMessageHeaders());
+        out.write(response.getMessageBody());
+        out.flush();
     }
 
     private void answer404NotFound(BufferedOutputStream out) throws IOException {
